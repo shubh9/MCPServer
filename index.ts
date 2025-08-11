@@ -11,6 +11,10 @@ app.use(express.json());
 app.use("/gmail", gmailRoutes);
 app.use("/brave", braveRoutes);
 
+app.get("/", (req, res) => {
+  res.send("im listening");
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 MCP Server running on port ${PORT}`);
