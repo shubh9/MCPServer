@@ -1,7 +1,8 @@
 import fetch from "node-fetch";
 
 async function main() {
-  const baseUrl = process.env.MCP_SERVER_URL || "http://localhost:3000";
+  const baseUrl = "https://mcp-server-eosin.vercel.app";
+  console.log("baseUrl: ", baseUrl);
   const url = `${baseUrl}/brave/search`;
 
   const userId = process.env.TEST_USER_ID || "local-user";

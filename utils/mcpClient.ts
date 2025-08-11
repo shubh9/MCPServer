@@ -26,6 +26,10 @@ export async function callMCPTool(
         ...process.env,
         ...(accessToken ? { ACCESS_TOKEN: accessToken } : {}),
         ...env,
+        // Fix npm permission issues in serverless environments
+        npm_config_cache: "/tmp/.npm",
+        npm_config_prefix: "/tmp/.npm-global",
+        HOME: "/tmp",
       },
       stdio: ["pipe", "pipe", "pipe"],
     });
@@ -102,7 +106,22 @@ export async function callMCPTool(
 
     child.on("error", (err) => {
       if (timer) clearTimeout(timer);
-      reject(err);
+      reject(
+        new Error(`Failed to spawn MCP module '${moduleName}': ${err.message}`)
+      );
+    });
+
+    child.on("close", (code, signal) => {
+      if (timer) clearTimeout(timer);
+      if (code !== 0) {
+        reject(
+          new Error(
+            `MCP module '${moduleName}' exited with code ${code}${
+              signal ? ` (signal: ${signal})` : ""
+            }`
+          )
+        );
+      }
     });
 
     // Handshake then call tool
